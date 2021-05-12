@@ -8,7 +8,7 @@ def HTML_scores_parse (URL):
 
     response = requests.get(URL)
     page = BeautifulSoup(response.text, 'html.parser')
-
+    
     mydivs = page.find_all("div", {"class": "post-body entry-content"})
     mydivs=str(mydivs)
     x = mydivs.find("1ra. Fecha")
@@ -31,13 +31,16 @@ def HTML_scores_parse (URL):
     with open('raw.txt', 'w') as file:
         file.write (mydivs)
 
-    pattern = r'(\S*\/\S*\/\S*) en (.*): (\D*) (\d*)\s?(\((.*)\))?, (\D*) (\d*)\s?(\((.*)\))?\n?(Nota:\s?.*.)?'
+    pattern = r'(\S*\/\S*\/\S*) en (.*): (\D*) (\d*)\s?(?:\((.*)\))?, (\D*) (\d*)\s?(?:\((.*)\))?\n?(Nota:\s?.*.)?'
     partidos = re.findall(pattern, mydivs)
     for partido in partidos:
         print (partido)
 
+    header=('Fecha','Lugar','Equipo 1','Goles 1','Goleadores 1','Equipo 2','Goles 2','Goleadores 2','Notas')
+
     with open('test.csv', 'w', encoding='utf-8') as file:
         file_writer = csv.writer(file)
+        file_writer.writerow(header)
         for row in partidos:
             file_writer.writerow(row)
 
