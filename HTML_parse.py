@@ -64,6 +64,7 @@ def HTML_scores_parse (URL):
     page_title=page.find('title') #uso el nombre de la pagina web como nombre de los archivos
     for label in HTML_LABELS:
         page_title=str(page_title).replace(label[0], label[1])
+    page_title=page_title.replace('historiayfutbol: Argentina: ','')
     raw_data_path =Path(current_dir+'/output/'+page_title+'_raw.txt')
     csv_path = Path(current_dir+'/output/'+page_title+'.csv')
     csv_error_path = Path(current_dir+'/output/'+page_title+'_errors.txt')
