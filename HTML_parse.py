@@ -15,7 +15,9 @@ def HTML_scores_parse (URL):
     mydivs = page.find_all("div", {"class": "post-body entry-content"})
     mydivs=str(mydivs)
     #x = mydivs.find("1ra. Fecha")
-    #mydivs=mydivs[x:]
+    x = mydivs.find("El Torneo")
+    if x < len(mydivs):
+        mydivs=mydivs[x:]
     HTML_LABELS=   [('<br/>','\n'),
                     ('<em>',''),
                     ('<span style="color:#33cc00;">',''),
