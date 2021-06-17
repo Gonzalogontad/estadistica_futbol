@@ -5,12 +5,43 @@ import re
 import csv 
 import pathlib
 from pathlib import Path
+import numpy as np
+import math
+from difflib import SequenceMatcher
 
+def unique_similars (teams1):
+    teams=[]
+    teams.append (teams1[0])
+    
+    for team1 in teams1:
+        match= False
+        for team in teams:
+            if SequenceMatcher(None, team1, team).ratio()>0.8:
+                match = True
+        if match == False:
+            teams.append(team1)
+    return teams
+
+def calcular_fechas(partidos):
+    nfant=0 #Numero de fecha anterior
+    equipos1 = [partido [2] for partido in partidos if len(partido)>2]
+    #equipos = list(set(equipos1))
+    equipos = unique_similars(equipos1)
+    print (equipos)
+    for npartido in range(len(partidos)):
+        partidos[npartido]=list (partidos[npartido])
+        cant=len(equipos)
+        cpf=math.floor(cant/2)
+        nf=(npartido+1)/cpf
+        nf=math.ceil(nf)
+        nf=int(nf)
+        partidos[npartido].append (str(nf))
+        
 def HTML_scores_parse (URL):
 
     response = requests.get(URL)
     page = BeautifulSoup(response.text, 'html.parser')
-    
+     
     #Busco el contenido de la pagina
     mydivs = page.find_all("div", {"class": "post-body entry-content"})
     mydivs=str(mydivs)
@@ -57,7 +88,7 @@ def HTML_scores_parse (URL):
                 error_lines.append(error_line)
                 errors.append(f'Error en linea {error_line}: {line}\n')
 
-
+    calcular_fechas(partidos)
 
     #Output files path
     current_dir = ''#str(pathlib.Path(__file__).parent) #Path actual
@@ -78,7 +109,7 @@ def HTML_scores_parse (URL):
         file.write (mydivs)
 
     #Encabezado del archivo CSV
-    header=('Fecha','Lugar','Equipo 1','Goles 1','Goleadores 1','Equipo 2','Goles 2','Goleadores 2','Notas')
+    header=('Fecha','Lugar','Equipo 1','Goles 1','Goleadores 1','Equipo 2','Goles 2','Goleadores 2','Notas', 'N Fecha')
 
     #Creo archivo de datos CSV
     with open(csv_path, 'w', encoding='utf-8') as file:
@@ -99,7 +130,7 @@ if __name__ == "__main__":
             'http://josecarluccio.blogspot.com/2010/02/argentina-1ra-aficionados-afa-1971-zona_21.html',
             'http://josecarluccio.blogspot.com/2010/02/argentina-1ra-aficionados-afa-1971-zona.html'
     ]
-
+    URLs = [ 'http://josecarluccio.blogspot.com/2010/02/argentina-1ra-b-afa-1971.html']
     for url in URLs:
         HTML_scores_parse(url)
 
