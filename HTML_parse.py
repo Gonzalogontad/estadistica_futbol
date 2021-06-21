@@ -9,18 +9,18 @@ import numpy as np
 import math
 from difflib import SequenceMatcher
 
-def unique_similars (teams1):
-    teams=[]
-    teams.append (teams1[0])
+def unique_similars (rep_elements):
+    uni_elements=[]
+    uni_elements.append (rep_elements[0])
     
-    for team1 in teams1:
+    for rep_element in rep_elements:
         match= False
-        for team in teams:
-            if SequenceMatcher(None, team1, team).ratio()>0.8:
+        for uni_element in uni_elements:
+            if SequenceMatcher(None, rep_element, uni_element).ratio()>0.8:
                 match = True
         if match == False:
-            teams.append(team1)
-    return teams
+            uni_elements.append(rep_element)
+    return uni_elements
 
 def calcular_fechas(partidos):
     nfant=0 #Numero de fecha anterior
@@ -36,6 +36,10 @@ def calcular_fechas(partidos):
         nf=math.ceil(nf)
         nf=int(nf)
         partidos[npartido].append (str(nf))
+
+
+        
+
         
 def HTML_scores_parse (URL):
 
