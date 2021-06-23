@@ -113,7 +113,7 @@ def HTML_scores_parse (URL):
         file.write (mydivs)
 
     #Encabezado del archivo CSV
-    header=('Fecha','Lugar','Equipo 1','Goles 1','Goleadores 1','Equipo 2','Goles 2','Goleadores 2','Notas', 'N Fecha')
+    header=('Fecha','Lugar','Equipo1','Goles1','Goleadores1','Equipo2','Goles2','Goleadores2','Notas', 'N_Fecha')
 
     #Creo archivo de datos CSV
     with open(csv_path, 'w', encoding='utf-8') as file:
