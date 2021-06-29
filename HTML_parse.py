@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 import math
 from difflib import SequenceMatcher
+from Estadios import get_stadium, get_stadiums_list
 
 def unique_similars (rep_elements):
     uni_elements=[]
@@ -91,8 +92,14 @@ def HTML_scores_parse (URL):
                 error_line = len (partidos)+1
                 error_lines.append(error_line)
                 errors.append(f'Error en linea {error_line}: {line}\n')
-
+    
     calcular_fechas(partidos)
+
+    stadiums_list = get_stadiums_list('Stadiums.csv')
+    for index, partido in enumerate(partidos):
+        stadium_name,stadium_wikiname = get_stadium (partido [1], partido [2], partido [5],partido [0],partido [8],stadiums_list)
+        partidos[index].append(stadium_name)
+        partidos[index].append(stadium_wikiname)
 
     #Output files path
     current_dir = ''#str(pathlib.Path(__file__).parent) #Path actual
@@ -113,7 +120,7 @@ def HTML_scores_parse (URL):
         file.write (mydivs)
 
     #Encabezado del archivo CSV
-    header=('Fecha','Lugar','Equipo1','Goles1','Goleadores1','Equipo2','Goles2','Goleadores2','Notas', 'N_Fecha')
+    header=('Fecha','Lugar','Equipo1','Goles1','Goleadores1','Equipo2','Goles2','Goleadores2','Notas', 'N_Fecha','Estadio','Estadio_wikiname')
 
     #Creo archivo de datos CSV
     with open(csv_path, 'w', encoding='utf-8') as file:
@@ -134,7 +141,7 @@ if __name__ == "__main__":
             'http://josecarluccio.blogspot.com/2010/02/argentina-1ra-aficionados-afa-1971-zona_21.html',
             'http://josecarluccio.blogspot.com/2010/02/argentina-1ra-aficionados-afa-1971-zona.html'
     ]
-    URLs = [ 'http://josecarluccio.blogspot.com/2010/02/argentina-1ra-b-afa-1971.html']
+    URLs = [ 'http://josecarluccio.blogspot.com/2009/06/argentina-1ra-b-afa-1953.html']
     for url in URLs:
         HTML_scores_parse(url)
 

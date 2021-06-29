@@ -71,6 +71,7 @@ def get_stadium(place, team1, team2, date, notes, stadiums):
     #Busco los estadios en el mismo lugar(ciudad)
     same_place=[]
     name = '***'+team1
+    wikiname= '***'+team1
     for stadium in stadiums:
         if SequenceMatcher(None, stadium['Place'], place).ratio()>0.6:
             if SequenceMatcher(None, stadium['Team'], team1).ratio()>0.6 or SequenceMatcher(None, stadium['Team'], team2).ratio()>0.6:
@@ -79,7 +80,8 @@ def get_stadium(place, team1, team2, date, notes, stadiums):
                 end_date = time.strptime(stadium['End'], "%d/%m/%Y")
                 if match_date>= start_date and match_date < end_date:
                     name=stadium['Name']
-    return name
+                    wikiname=stadium['WikiName']
+    return name, wikiname
 
 def get_stadiums_list (CSV_path):
     stadiums_list=[]
@@ -95,4 +97,4 @@ if __name__ == "__main__":
     stadium_name=get_stadium ('Nuñez', 'huracan', 'boca','25/11/1990','Nota: Se jugo en cancha de river.',stadiums_list)
     print (stadium_name)
 
-    scrap_stadiums('https://www.estadiosdeargentina.com.ar/','Stadiums2.csv')
+    #scrap_stadiums('https://www.estadiosdeargentina.com.ar/','Stadiums2.csv')
