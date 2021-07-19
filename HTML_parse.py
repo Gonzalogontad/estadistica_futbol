@@ -1,4 +1,3 @@
-
 from bs4 import BeautifulSoup
 import requests
 import re
@@ -28,7 +27,7 @@ def calcular_fechas(partidos):
     equipos1 = [partido [2] for partido in partidos if len(partido)>2]
     #equipos = list(set(equipos1))
     equipos = unique_similars(equipos1)
-    print (equipos)
+    #print (equipos)
     for npartido in range(len(partidos)):
         partidos[npartido]=list (partidos[npartido])
         cant=len(equipos)
@@ -46,18 +45,27 @@ def HTML_scores_parse (URL):
 
     response = requests.get(URL)
     page = BeautifulSoup(response.text, 'html.parser')
-     
+    #Reemplazo los tags <br> por \n para poder hacer split de lineas
+    for br in page.find_all("br"):
+        br.replace_with("\n")
+    
+    mydivs = page.getText()#Elimino todos los tags HTML
+
+    '''
     #Busco el contenido de la pagina
     mydivs = page.find_all("div", {"class": "post-body entry-content"})
     mydivs=str(mydivs)
+    '''
     #x = mydivs.find("1ra. Fecha")
     x = mydivs.find("El Torneo")
     if x < len(mydivs):
         mydivs=mydivs[x:]
+    '''
     HTML_LABELS=   [('<br/>','\n'),
                     ('<em>',''),
                     ('<span style="color:#33cc00;">',''),
                     ('<span style="color:#cc66cc;">',''),
+                    ('<span style="color:#009900;">',''),
                     ('<strong>',''),
                     ('</strong>',''),
                     ('</em>',''),
@@ -67,12 +75,13 @@ def HTML_scores_parse (URL):
                     ('</div>',''),
                     ('<title>',''),
                     ('</title>','')]
-    #elimino etiquetas HTML para obtener texto plano
+    elimino etiquetas HTML para obtener texto plano
     for label in HTML_LABELS:
-        mydivs=mydivs.replace(label[0], label[1])                
+        mydivs=mydivs.replace(label[0], label[1])  
+    '''              
     
     pattern = r'(\S*\/\S*\/\S*):? en (.*): (\D*) (\d*)\s?(?:\((.*)\))?, (\D*) (\d*)\s?(?:\((.*)\))?-?(Nota:\s?.*.)?'
-    pattern_date = r'(\S*\/\S*\/\S*)'
+    pattern_date = r'(\d\d\/\d\d\/\d*)'
     mydivs=mydivs.replace('\nNota:','-Nota:') #si se encuantra una nota, se quita \n para que se anexe al partido
     lines = mydivs.splitlines()
     
@@ -95,18 +104,25 @@ def HTML_scores_parse (URL):
     
     calcular_fechas(partidos)
 
+    #Obtener nombre del torneo
+    page_title=page.find('title') #uso el nombre de la pagina web como nombre del torneo
+    page_title=page_title.getText()
+    page_title=page_title.replace('historiayfutbol: Argentina: ','')
+
     stadiums_list = get_stadiums_list('Stadiums.csv')
+    if (not stadiums_list):
+        raise Exception('Error al leer el archivo de Estadios')
     for index, partido in enumerate(partidos):
-        stadium_name,stadium_wikiname = get_stadium (partido [1], partido [2], partido [5],partido [0],partido [8],stadiums_list)
-        partidos[index].append(stadium_name)
-        partidos[index].append(stadium_wikiname)
+        if len(partido) == 10:
+            stadium_name,stadium_wikiname = get_stadium (partido [1], partido [2], partido [5],partido [0],partido [8],stadiums_list)
+            partidos[index].append(stadium_name)
+            partidos[index].append(stadium_wikiname)
+            partidos[index].append(page_title)
+
 
     #Output files path
     current_dir = ''#str(pathlib.Path(__file__).parent) #Path actual
-    page_title=page.find('title') #uso el nombre de la pagina web como nombre de los archivos
-    for label in HTML_LABELS:
-        page_title=str(page_title).replace(label[0], label[1])
-    page_title=page_title.replace('historiayfutbol: Argentina: ','')
+
     #raw_data_path =Path(current_dir+'/output/'+page_title+'_raw.txt')
     #csv_path = Path(current_dir+'/output/'+page_title+'.csv')
     #csv_error_path = Path(current_dir+'/output/'+page_title+'_errors.txt')
@@ -120,7 +136,7 @@ def HTML_scores_parse (URL):
         file.write (mydivs)
 
     #Encabezado del archivo CSV
-    header=('Fecha','Lugar','Equipo1','Goles1','Goleadores1','Equipo2','Goles2','Goleadores2','Notas', 'N_Fecha','Estadio','Estadio_wikiname')
+    header=('Fecha','Lugar','Equipo1','Goles1','Goleadores1','Equipo2','Goles2','Goleadores2','Notas', 'N_Fecha','Estadio','Estadio_wikiname','Torneo')
 
     #Creo archivo de datos CSV
     with open(csv_path, 'w', encoding='utf-8') as file:
@@ -141,7 +157,7 @@ if __name__ == "__main__":
             'http://josecarluccio.blogspot.com/2010/02/argentina-1ra-aficionados-afa-1971-zona_21.html',
             'http://josecarluccio.blogspot.com/2010/02/argentina-1ra-aficionados-afa-1971-zona.html'
     ]
-    URLs = [ 'http://josecarluccio.blogspot.com/2009/06/argentina-1ra-b-afa-1953.html']
+    #URLs = [ 'http://josecarluccio.blogspot.com/2009/06/argentina-1ra-b-afa-1953.html']
     for url in URLs:
         HTML_scores_parse(url)
 
