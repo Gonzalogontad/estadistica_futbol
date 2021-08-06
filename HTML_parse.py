@@ -108,6 +108,8 @@ def HTML_scores_parse (URL):
     page_title=page.find('title') #uso el nombre de la pagina web como nombre del torneo
     page_title=page_title.getText()
     page_title=page_title.replace('historiayfutbol: Argentina: ','')
+    page_title=page_title.replace('"','')
+    page_title=page_title.replace('/','-')
 
     stadiums_list = get_stadiums_list('Stadiums.csv')
     if (not stadiums_list):
@@ -132,7 +134,7 @@ def HTML_scores_parse (URL):
     print (page_title)
     
     #Creo archivo de datos en bruto
-    with open(raw_data_path, 'w') as file:
+    with open(raw_data_path, 'w', encoding='utf-8') as file:
         file.write (mydivs)
 
     #Encabezado del archivo CSV
